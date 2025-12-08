@@ -1,25 +1,9 @@
-streamlit
-torch
-torchvision
-torchaudio
-
-pandas
-numpy
-tqdm
-matplotlib
-seaborn
-Pillow
-opencv-python
-albumentations
-albumentations[pytorch]
-pycocotools
-torchxrayvision
+torch==2.2.0+cpu
+torchvision==0.17.0+cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 
 transformers
-nltk
-rouge-score
-
-scikit-learn
-requests
-tensorflow
-keras
+streamlit
+Pillow
+numpy
+opencv-python-headless
