@@ -141,6 +141,14 @@ elif app_mode == "Report Generation":
 
             with st.spinner("AI is analyzing both images..."):
                 report_text = report_model.generate(front_display, lateral_display)
+                report_text = report_text.replace("<end1>", "").replace("<end2>", "")
+
+                # Replace the section markers with clean headers
+                report_text = report_text.replace("<start1>", "Findings: ")
+                report_text = report_text.replace("<start2>", "Impression: ")
+
+                # Remove any double dots/spaces
+                report_text = report_text.replace("..", ".").strip()
 
             st.markdown("---")
             st.header("📄 Generated Radiology Report")

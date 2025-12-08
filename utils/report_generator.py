@@ -109,20 +109,32 @@ class ReportGenerator:
     # Autoregressive text generation
     # -------------------------
     @torch.no_grad()
-    def generate(self, front_img, lateral_img):
+    def generate(self, front_img, lateral_img, prompt="Findings: "):
         img_tensor = self.preprocess(front_img, lateral_img)
 
-        start_id = self.tokenizer.bos_token_id or self.tokenizer.pad_token_id
-        input_ids = torch.tensor([[start_id]], device=self.device)
-        attention_mask = torch.ones_like(input_ids)
+        # Encode prompt text
+        enc = self.tokenizer(
+            prompt,
+            return_tensors="pt",
+            add_special_tokens=False
+        )
+        input_ids = enc["input_ids"].to(self.device)          # shape (1, L)
+        attention_mask = enc["attention_mask"].to(self.device)
 
         generated = input_ids
 
         for _ in range(self.max_length):
             out = self.model(img_tensor, generated, attention_mask)
-            next_token = torch.argmax(out.logits[0, -1, :]).item()
+            logits = out.logits[0, -1, :]
 
-            generated = torch.cat([generated, torch.tensor([[next_token]], device=self.device)], dim=1)
+            # Greedy (for now)
+            next_token = torch.argmax(logits).item()
+
+            generated = torch.cat(
+                [generated,
+                 torch.tensor([[next_token]], device=self.device)],
+                dim=1
+            )
             attention_mask = torch.ones_like(generated)
 
             if next_token == self.tokenizer.eos_token_id:
